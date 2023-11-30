@@ -2,7 +2,7 @@
 Sample application illustrating the use of the Card Management SDK for iOS
 
 ## Requirements
-This project was configured with Xcode 15 and target iOS varions 15.
+This project was configured with Xcode 15 and target iOS version 15.
 
 ## Installation
 The project uses [CocoaPods](https://cocoapods.org/) package manager to attach SDK as a dependency,
