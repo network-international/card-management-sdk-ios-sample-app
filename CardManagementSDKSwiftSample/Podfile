@@ -1,0 +1,9 @@
+platform :ios, '15.0'
+
+target 'CardManagementSDKSwiftSample' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  pod 'NICardManagementSDK', '~> 1.0'
+
+end
