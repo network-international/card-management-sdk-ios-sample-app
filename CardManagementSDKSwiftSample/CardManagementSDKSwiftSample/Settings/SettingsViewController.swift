@@ -13,6 +13,29 @@ class SettingsViewController: UIViewController {
     private let viewModel: SettingsViewModel
     private var bag = Set<AnyCancellable>()
     
+    // MARK: - DataSource
+    
+    private typealias DataSource = UICollectionViewDiffableDataSource<Section, Item>
+    private typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Item>
+    private let layout: UICollectionViewLayout = {
+        var listConfiguration = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+        //listConfiguration.showsSeparators = false
+        listConfiguration.headerMode = .firstItemInSection
+        return UICollectionViewCompositionalLayout.list(using: listConfiguration)
+    }()
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+    private lazy var dataSource: DataSource = {
+        let cellRegistration = UICollectionView.CellRegistration(handler: cellRegistrationHandler)
+        return DataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
+            return collectionView.dequeueConfiguredReusableCell(
+                using: cellRegistration, for: indexPath, item: itemIdentifier)
+        }
+    }()
+    
     init(viewModel: SettingsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -25,125 +48,32 @@ class SettingsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        applySnapshot()
     }
 }
 
 private extension SettingsViewController {
     func setupView() {
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(scrollView)
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
-        ])
-        
-        let stackView = UIStackView()
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.addSubview(stackView)
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            stackView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -32)
-        ])
-        stackView.axis = .vertical
-        stackView.spacing = 16
-        
-        // MARK: - Logo
+        // Logo
         let logo = LogoView(currentLanguage: viewModel.settingsProvider.currentLanguage)
+        view.addSubview(logo)
         viewModel.settingsProvider.$currentLanguage
             .receive(on: RunLoop.main)
             .sink { [logo] lang in logo.update(with: lang) }
             .store(in: &bag)
-        stackView.addArrangedSubview(logo)
-        
-        // MARK: - Card Identifier Id
-        let cardIdentifierId = SettingsItemView(
-            title: "Card Identifier Id",
-            value: viewModel.settingsProvider.settings.cardIdentifier.Id,
-            handler: { [weak self] text in
-                guard let self = self else { return }
-                var settings = self.viewModel.settingsProvider.settings
-                settings.cardIdentifier.Id = text ?? ""
-                self.viewModel.updateSettings(settings)
-            }
-        )
-        stackView.addArrangedSubview(cardIdentifierId)
-        
-        // MARK: - Card Identifier Type
-        let cardIdentifierType = SettingsItemView(
-            title: "Card Identifier Type",
-            value: viewModel.settingsProvider.settings.cardIdentifier.type,
-            handler: { [weak self] text in
-                guard let self = self else { return }
-                var settings = self.viewModel.settingsProvider.settings
-                settings.cardIdentifier.type = text ?? ""
-                self.viewModel.updateSettings(settings)
-            }
-        )
-        stackView.addArrangedSubview(cardIdentifierType)
-        
-        // MARK: - Root URL
-        let rootUrl = SettingsItemView(
-            title: "Root URL",
-            value: viewModel.settingsProvider.settings.connection.baseUrl,
-            handler: { [weak self] text in
-                guard let self = self else { return }
-                var settings = self.viewModel.settingsProvider.settings
-                settings.connection.baseUrl = text ?? ""
-                self.viewModel.updateSettings(settings)
-            }
-        )
-        stackView.addArrangedSubview(rootUrl)
-        
-        // MARK: - Token
-        let token = SettingsItemView(
-            title: "Token",
-            value: viewModel.settingsProvider.settings.connection.token,
-            handler: { [weak self] text in
-                guard let self = self else { return }
-                var settings = self.viewModel.settingsProvider.settings
-                settings.connection.token = text ?? ""
-                self.viewModel.updateSettings(settings)
-            }
-        )
-        stackView.addArrangedSubview(token)
-        
-        // MARK: - Bank code
-        let bankCode = SettingsItemView(
-            title: "Bank code",
-            value: viewModel.settingsProvider.settings.connection.bankCode,
-            handler: { [weak self] text in
-                guard let self = self else { return }
-                var settings = self.viewModel.settingsProvider.settings
-                settings.connection.bankCode = text ?? ""
-                self.viewModel.updateSettings(settings)
-            }
-        )
-        stackView.addArrangedSubview(bankCode)
-        
-        // MARK: - PIN length
-        let pinType = SettingsItemView(
-            title: "PIN length",
-            value: viewModel.settingsProvider.settings.pinType.text
-        )
-        let pickerView = UIPickerView()
-        pickerView.delegate = self
-        pickerView.dataSource = self
-        pinType.textField.inputView = pickerView
-        stackView.addArrangedSubview(pinType)
-        viewModel.settingsProvider.$settings
-            .map(\.pinType)
-            .receive(on: RunLoop.main)
-            .sink { [weak pinType] pinValue in
-                pinType?.textField.text = pinValue.text
-            }
-            .store(in: &bag)
-        
-        // MARK: - Language
+        NSLayoutConstraint.activate([
+            logo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            logo.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            logo.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
+        // CollectionView
+        view.addSubview(collectionView)
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: logo.bottomAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
     }
 }
 
@@ -177,5 +107,170 @@ private extension NIPinFormType {
         @unknown default:
             fatalError()
         }
+    }
+}
+
+// MARK: - DataSource
+private extension SettingsViewController {
+    enum Section: Int, CustomStringConvertible, CaseIterable {
+        case cardIdentifier
+        case connection
+        case pinType
+        case language
+        case theme
+        
+        var description: String {
+            switch self {
+            case .cardIdentifier: return "Card Identifier"
+            case .connection: return "Connection settings"
+            case .pinType: return "Pin Length"
+            case .language: return "Language"
+            case .theme: return "Theme"
+            }
+        }
+    }
+    enum Item: Identifiable, Hashable {
+        case header(String)
+        case row(ItemValue)
+        
+        // MARK: - Identifiable
+        var id: String {
+            switch self {
+            case let .row(value):
+                return value.name.rawValue
+            case let .header(title):
+                return title
+            }
+        }
+    }
+    struct ItemValue: Hashable {
+        var name: ItemName
+        var text: String
+    }
+    enum ItemName: String {
+        case cardIdentifierId = "Card Identifier Id"
+        case cardIdentifierType = "Card Identifier Type"
+        case rootUrl = "Root URL"
+        case token = "Token"
+        case bankCode = "Bank code"
+        case pinLength = "PIN length"
+        case language = "Language"
+        case theme = "Theme"
+    }
+    
+    func cellRegistrationHandler(cell: UICollectionViewListCell, indexPath: IndexPath, item: Item) {
+        switch item {
+        case let .row(itemValue) where itemValue.name == .theme:
+            var config = cell.segmentedConfiguration()
+            config.segments = viewModel.themes.map(\.name)
+            config.selectedIndex = viewModel.selectedThemeIdx
+            config.segmentSelected = { [weak self] segment in
+                self?.updateSettings(itemName: itemValue.name, text: segment)
+            }
+            cell.contentConfiguration = config
+        case let .row(itemValue) where itemValue.name == .language:
+            var config = cell.segmentedConfiguration()
+            config.segments = viewModel.languages.map(\.localizedString)
+            config.selectedIndex = viewModel.selectedLanguageIdx
+            config.segmentSelected = { [weak self] segment in
+                self?.updateSettings(itemName: itemValue.name, text: segment)
+            }
+            cell.contentConfiguration = config
+        case let .row(itemValue):
+            var config = cell.textFieldConfiguration()
+            config.text = itemValue.text
+            config.placeholder = itemValue.name.rawValue
+            config.pickerSource = itemValue.name == .pinLength ? NIPinFormType.allCases.map(\.text) : nil
+            config.textChanged = { [weak self] text in
+                self?.updateSettings(itemName: itemValue.name, text: text ?? "")
+            }
+            cell.contentConfiguration = config
+        case let .header(title):
+            var contentConfiguration = cell.defaultContentConfiguration()
+            contentConfiguration.text = title
+            cell.contentConfiguration = contentConfiguration
+        }
+    }
+    func applySnapshot() {
+        var snapshot = dataSource.snapshot()
+        snapshot.deleteAllItems()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems([
+            .header(Section.cardIdentifier.description),
+            .row(.init(
+                name: .cardIdentifierId,
+                text: viewModel.settingsProvider.settings.cardIdentifier.Id
+            )),
+            .row(.init(
+                name: .cardIdentifierType,
+                text: viewModel.settingsProvider.settings.cardIdentifier.type
+            ))
+        ], toSection: .cardIdentifier)
+        snapshot.appendItems([
+            .header(Section.connection.description),
+            .row(.init(
+                name: .rootUrl,
+                text: viewModel.settingsProvider.settings.connection.baseUrl
+            )),
+            .row(.init(
+                name: .token,
+                text: viewModel.settingsProvider.settings.connection.token
+            )),
+            .row(.init(
+                name: .bankCode,
+                text: viewModel.settingsProvider.settings.connection.bankCode
+            ))
+        ], toSection: .connection)
+        snapshot.appendItems([
+            .header(Section.pinType.description),
+            .row(.init(
+                name: .pinLength,
+                text: viewModel.settingsProvider.settings.pinType.text
+            ))
+        ], toSection: .pinType)
+        snapshot.appendItems([
+            .header(Section.language.description),
+            .row(.init(
+                name: .language,
+                text: viewModel.settingsProvider.currentLanguage.localizedString
+            ))
+        ], toSection: .language)
+        snapshot.appendItems([
+            .header(Section.theme.description),
+            .row(.init(
+                name: .theme,
+                text: viewModel.settingsProvider.theme.name
+            ))
+        ], toSection: .theme)
+        dataSource.applySnapshotUsingReloadData(snapshot)
+    }
+    
+    func updateSettings(itemName: ItemName, text: String) {
+        var settings = self.viewModel.settingsProvider.settings
+        switch itemName {
+        case .cardIdentifierId:
+            settings.cardIdentifier.Id = text
+        case .cardIdentifierType:
+            settings.cardIdentifier.type = text
+        case .rootUrl:
+            settings.connection.baseUrl = text
+        case .token:
+            settings.connection.token = text
+        case .bankCode:
+            settings.connection.bankCode = text
+        case .pinLength:
+            settings.pinType = NIPinFormType.allCases.first { $0.text == text } ?? NIPinFormType.allCases[0]
+        case .language:
+            if let lang = viewModel.languages.first(where: { $0.localizedString == text }) {
+                viewModel.updateLanguage(lang)
+            }
+            return
+        case .theme:
+            if let theme = viewModel.themes.first(where: { $0.name == text }) {
+                viewModel.updateTheme(theme)
+            }
+            return
+        }
+        viewModel.updateSettings(settings)
     }
 }
