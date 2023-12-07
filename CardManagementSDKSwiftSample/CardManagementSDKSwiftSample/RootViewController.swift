@@ -22,7 +22,7 @@ class RootViewController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(resource: .background)
+        view.backgroundColor = .systemGroupedBackground
         
         let cardVc = CardViewController(viewModel: CardViewModel(settingsProvider: viewModel.settingsProvider))
         cardVc.tabBarItem = UITabBarItem(title: "Card", image: UIImage(systemName: "creditcard.and.123"), tag: 0)

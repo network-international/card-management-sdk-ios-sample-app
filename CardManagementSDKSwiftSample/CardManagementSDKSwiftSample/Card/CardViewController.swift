@@ -22,7 +22,13 @@ class CardViewController: UIViewController {
         self?.presentedViewController?.dismiss(animated: true)
         guard let error = errorResponse else { return }
         let alert = UIAlertController(title: "Fail", message: error.errorMessage, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: .destructive, handler: nil))
+        
+        if let attributedString = try? NSAttributedString(data: Data(error.errorMessage.utf8), options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
+            alert.title = nil
+            alert.setValue(attributedString, forKey: "attributedMessage")
+        }
+        
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
         self?.present(alert, animated: true)
     }
     
@@ -110,12 +116,18 @@ private extension CardViewController {
     }
     
     func setupView() {
+        view.addSubview(logo)
+        NSLayoutConstraint.activate([
+            logo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            logo.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            logo.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: logo.bottomAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16)
@@ -170,9 +182,6 @@ private extension CardViewController {
     
     func fillContent() {
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        
-        stackView.addArrangedSubview(logo)
-
         stackView.addArrangedSubview(cardViewHolder)
         
         // show card
