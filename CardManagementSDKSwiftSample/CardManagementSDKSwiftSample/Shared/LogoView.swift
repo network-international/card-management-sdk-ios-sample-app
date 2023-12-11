@@ -11,6 +11,8 @@ import NICardManagementSDK
 class LogoView: UIView {
     
     private let logoImageView: UIImageView
+    private var leadingConstraint: NSLayoutConstraint!
+    private var trailingConstraint: NSLayoutConstraint!
     
     required init(currentLanguage: NILanguage) {
         logoImageView = UIImageView(image: currentLanguage.logo)
@@ -24,9 +26,11 @@ class LogoView: UIView {
             logoImageView.topAnchor.constraint(equalTo: topAnchor),
             logoImageView.bottomAnchor.constraint(equalTo: bottomAnchor),
             logoImageView.widthAnchor.constraint(lessThanOrEqualTo: widthAnchor, multiplier: 0.5),
-            logoImageView.heightAnchor.constraint(equalToConstant: 50),
-            logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor)
+            logoImageView.heightAnchor.constraint(equalToConstant: 50)
         ])
+        leadingConstraint = logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor)
+        trailingConstraint = logoImageView.trailingAnchor.constraint(equalTo: trailingAnchor)
+        leadingConstraint.isActive = true
     }
     
     required init(coder aDecoder: NSCoder) {
@@ -35,6 +39,8 @@ class LogoView: UIView {
     
     func update(with language: NILanguage) {
         logoImageView.image = language.logo
+        leadingConstraint.isActive = language == .english
+        trailingConstraint.isActive = language == .arabic
     }
 }
 

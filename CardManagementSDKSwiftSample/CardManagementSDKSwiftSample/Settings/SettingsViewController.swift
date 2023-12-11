@@ -19,7 +19,7 @@ class SettingsViewController: UIViewController {
     private typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Item>
     private let layout: UICollectionViewLayout = {
         var listConfiguration = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
-        //listConfiguration.showsSeparators = false
+        listConfiguration.showsSeparators = true
         listConfiguration.headerMode = .firstItemInSection
         return UICollectionViewCompositionalLayout.list(using: listConfiguration)
     }()
@@ -57,10 +57,6 @@ private extension SettingsViewController {
         // Logo
         let logo = LogoView(currentLanguage: viewModel.settingsProvider.currentLanguage)
         view.addSubview(logo)
-        viewModel.settingsProvider.$currentLanguage
-            .receive(on: RunLoop.main)
-            .sink { [logo] lang in logo.update(with: lang) }
-            .store(in: &bag)
         NSLayoutConstraint.activate([
             logo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             logo.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
@@ -74,6 +70,15 @@ private extension SettingsViewController {
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
+        
+        viewModel.settingsProvider.$currentLanguage
+            .receive(on: RunLoop.main)
+            .sink { [logo] lang in logo.update(with: lang) }
+            .store(in: &bag)
+        viewModel.settingsProvider.$theme
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.applySnapshot() }
+            .store(in: &bag)
     }
 }
 
@@ -159,29 +164,34 @@ private extension SettingsViewController {
     }
     
     func cellRegistrationHandler(cell: UICollectionViewListCell, indexPath: IndexPath, item: Item) {
+        if #available(iOS 16.0, *) {
+            cell.backgroundConfiguration = cell.defaultBackgroundConfiguration()
+        }
         switch item {
         case let .row(itemValue) where itemValue.name == .theme:
             var config = cell.segmentedConfiguration()
             config.segments = viewModel.themes.map(\.name)
             config.selectedIndex = viewModel.selectedThemeIdx
-            config.segmentSelected = { [weak self] segment in
+            config.segmentSelected = { [weak self, itemValue] segment in
                 self?.updateSettings(itemName: itemValue.name, text: segment)
             }
             cell.contentConfiguration = config
+            cell.backgroundConfiguration = nil
         case let .row(itemValue) where itemValue.name == .language:
             var config = cell.segmentedConfiguration()
             config.segments = viewModel.languages.map(\.localizedString)
             config.selectedIndex = viewModel.selectedLanguageIdx
-            config.segmentSelected = { [weak self] segment in
+            config.segmentSelected = { [weak self, itemValue] segment in
                 self?.updateSettings(itemName: itemValue.name, text: segment)
             }
             cell.contentConfiguration = config
+            cell.backgroundConfiguration = nil
         case let .row(itemValue):
             var config = cell.textFieldConfiguration()
             config.text = itemValue.text
             config.placeholder = itemValue.name.rawValue
             config.pickerSource = itemValue.name == .pinLength ? NIPinFormType.allCases.map(\.text) : nil
-            config.textChanged = { [weak self] text in
+            config.textChanged = { [weak self, itemValue] text in
                 self?.updateSettings(itemName: itemValue.name, text: text ?? "")
             }
             cell.contentConfiguration = config
