@@ -173,7 +173,7 @@ private extension CardViewController {
                 if let cardView = self.cardViewHolder.subviews.last as? NICardView {
                     cardView.setInput(input: self.cardViewInput, completion: self.cardViewCallback)
                     // this can be done with `cardAttributes`
-                    cardView.setBackgroundImage(image: viewModel.settingsProvider.cardBackgroundImage)
+                    // cardView.setBackgroundImage(image: viewModel.settingsProvider.cardBackgroundImage)
                 } else {
                     // card
                     let cardView = NICardView(input: self.cardViewInput, completion: self.cardViewCallback)

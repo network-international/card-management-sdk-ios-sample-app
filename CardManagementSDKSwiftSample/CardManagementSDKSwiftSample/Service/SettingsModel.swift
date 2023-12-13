@@ -58,5 +58,5 @@ extension SettingsModel.CardIdentifier {
 
 extension NIPinFormType {
     // according to SDK if no pinType provided - use `.dynamic`
-    static var initial: Self { .dynamic }
+    static var initial: Self { .fourDigits }
 }

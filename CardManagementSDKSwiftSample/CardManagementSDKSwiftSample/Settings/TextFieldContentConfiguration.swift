@@ -106,6 +106,7 @@ extension TextFieldContentView: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         textField.text = _configuration.pickerSource?[row]
+        _configuration.textChanged?(textField.text)
         textField.resignFirstResponder()
     }
 }
