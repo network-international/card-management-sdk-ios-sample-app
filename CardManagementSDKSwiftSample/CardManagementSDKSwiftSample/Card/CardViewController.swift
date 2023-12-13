@@ -62,28 +62,7 @@ class CardViewController: UIViewController {
 private extension CardViewController {
     
     var cardViewInput: NIInput {
-        var fonts: [NIFontLabelPair]?
-        // Example of setting of a specific fonts (this is optional)
-        fonts = [
-            NIFontLabelPair(
-                font: UIFont(name: "Helvetica", size: 18)!, // System font
-                label: .setPinDescriptionLabel
-            ),
-            NIFontLabelPair(
-                font: UIFont(name: "Helvetica", size: 18)!, // System font
-                label: .verifyPinDescriptionLabel
-            )
-        ]
-//        fonts = [
-//             (font: UIFont(name: "Arial", size: 14.0)!, label: .cardNumberLabel),
-//            NIFontLabelPair(font: valueFont, label: .cardNumberValueLabel),
-//            NIFontLabelPair(font: labelFont, label: .expiryDateLabel),
-//            NIFontLabelPair(font: valueFont, label: .expiryDateValueLabel),
-//            NIFontLabelPair(font: labelFont, label: .cvvLabel),
-//            NIFontLabelPair(font: valueFont, label: .cvvValueLabel),
-//            NIFontLabelPair(font: labelFont, label: .cardholderNameLabel),
-//            NIFontLabelPair(font: labelFont, label: .cardholderNameTagLabel)
-//        ]
+
         
         return NIInput(
             bankCode: viewModel.settingsProvider.settings.connection.bankCode,
@@ -96,7 +75,7 @@ private extension CardViewController {
             displayAttributes: NIDisplayAttributes(
                 theme: viewModel.settingsProvider.theme,
                 language: viewModel.settingsProvider.currentLanguage, // can be nil
-                fonts: fonts ?? [], // can be omitted
+                fonts: viewModel.settingsProvider.fonts, // can be omitted
                 cardAttributes: cardAttributes // can be nil
             )
         )
@@ -105,13 +84,8 @@ private extension CardViewController {
     var cardAttributes: NICardAttributes {
         NICardAttributes(
             shouldHide: true,
-            backgroundImage: UIImage(resource: .background),
-            textPositioning: NICardDetailsTextPositioning(
-                leftAlignment: 0.09,
-                cardNumberGroupTopAlignment: 0.4,
-                dateCvvGroupTopAlignment: 0.6,
-                cardHolderNameGroupTopAlignment: 0.8
-            )
+            backgroundImage: viewModel.settingsProvider.cardBackgroundImage,
+            textPositioning: viewModel.settingsProvider.textPosition.sdkValue
         )
     }
     
@@ -197,12 +171,12 @@ private extension CardViewController {
                 
                 // show in-place
                 if let cardView = self.cardViewHolder.subviews.last as? NICardView {
-                    cardView.setInput(input: self.cardViewInput, completion: cardViewCallback)
+                    cardView.setInput(input: self.cardViewInput, completion: self.cardViewCallback)
+                    // this can be done with `cardAttributes`
+                    cardView.setBackgroundImage(image: viewModel.settingsProvider.cardBackgroundImage)
                 } else {
                     // card
-                    let cardView = NICardView(input: cardViewInput, completion: cardViewCallback)
-                    // this can be done with `cardAttributes`
-                    // cardView.setBackgroundImage(image: UIImage(resource: .background))
+                    let cardView = NICardView(input: self.cardViewInput, completion: self.cardViewCallback)
                     self.cardViewHolder.addSubview(cardView)
                     cardView.translatesAutoresizingMaskIntoConstraints = false
                     NSLayoutConstraint.activate([

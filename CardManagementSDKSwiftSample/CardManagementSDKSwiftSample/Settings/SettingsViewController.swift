@@ -82,25 +82,6 @@ private extension SettingsViewController {
     }
 }
 
-// MARK: - Picker
-extension SettingsViewController: UIPickerViewDelegate, UIPickerViewDataSource {
-    
-    func numberOfComponents(in pickerView: UIPickerView) -> Int { 1 }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int { NIPinFormType.allCases.count }
-    
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        NIPinFormType.allCases[row].text
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        var settings = viewModel.settingsProvider.settings
-        settings.pinType = NIPinFormType.allCases[row]
-        viewModel.updateSettings(settings)
-        self.view.endEditing(true)
-    }
-}
-
 // MARK: -
 private extension NIPinFormType {
     var text: String {
@@ -116,13 +97,14 @@ private extension NIPinFormType {
 }
 
 // MARK: - DataSource
-private extension SettingsViewController {
+fileprivate extension SettingsViewController {
     enum Section: Int, CustomStringConvertible, CaseIterable {
         case cardIdentifier
         case connection
         case pinType
         case language
         case theme
+        case textPositioning
         
         var description: String {
             switch self {
@@ -131,6 +113,7 @@ private extension SettingsViewController {
             case .pinType: return "Pin Length"
             case .language: return "Language"
             case .theme: return "Theme"
+            case .textPositioning: return "Text Positioning"
             }
         }
     }
@@ -161,13 +144,34 @@ private extension SettingsViewController {
         case pinLength = "PIN length"
         case language = "Language"
         case theme = "Theme"
+        // textPositioning
+        case leftAlignment = "Left Alignment"
+        case cardNumberGroupTopAlignment = "CardNumber Top"
+        case dateCvvGroupTopAlignment = "DateCvvGroup Top"
+        case cardHolderNameGroupTopAlignment = "CardHolderName Top"
+        
+        static var textPositioning: [ItemName] {
+            [.leftAlignment, .cardNumberGroupTopAlignment, .dateCvvGroupTopAlignment, .cardHolderNameGroupTopAlignment]
+        }
     }
     
     func cellRegistrationHandler(cell: UICollectionViewListCell, indexPath: IndexPath, item: Item) {
         if #available(iOS 16.0, *) {
-            cell.backgroundConfiguration = cell.defaultBackgroundConfiguration()
+            var backgroundConfiguration = cell.defaultBackgroundConfiguration()
+            backgroundConfiguration.backgroundColorTransformer = UIConfigurationColorTransformer { _ in
+                .secondarySystemGroupedBackground // disable selection style
+            }
+            cell.backgroundConfiguration = backgroundConfiguration
         }
         switch item {
+        case let .row(itemValue) where ItemName.textPositioning.contains(itemValue.name):
+            var config = cell.stepperConfiguration()
+            config.initialValue = viewModel.settingsProvider.textPosition.value(for: itemValue.name)
+            config.name = itemValue.name.rawValue
+            config.updatedValue = { [weak self, itemValue] stepperValue in
+                self?.updateTextPositioning(itemName: itemValue.name, value: stepperValue)
+            }
+            cell.contentConfiguration = config
         case let .row(itemValue) where itemValue.name == .theme:
             var config = cell.segmentedConfiguration()
             config.segments = viewModel.themes.map(\.name)
@@ -246,17 +250,58 @@ private extension SettingsViewController {
             ))
         ], toSection: .language)
         snapshot.appendItems([
-            .header(Section.theme.description),
+            .header(Section.textPositioning.description),
             .row(.init(
                 name: .theme,
                 text: viewModel.settingsProvider.theme.name
             ))
         ], toSection: .theme)
+        snapshot.appendItems([
+            .header(Section.textPositioning.description),
+            .row(.init(
+                name: .leftAlignment,
+                text: viewModel.settingsProvider.textPosition.leftAlignment.description
+            )),
+            .row(.init(
+                name: .cardNumberGroupTopAlignment,
+                text: viewModel.settingsProvider.textPosition.cardNumberGroupTopAlignment.description
+            )),
+            .row(.init(
+                name: .dateCvvGroupTopAlignment,
+                text: viewModel.settingsProvider.textPosition.dateCvvGroupTopAlignment.description
+            )),
+            .row(.init(
+                name: .cardHolderNameGroupTopAlignment,
+                text: viewModel.settingsProvider.textPosition.cardHolderNameGroupTopAlignment.description
+            )),
+        ], toSection: .textPositioning)
+        
         dataSource.applySnapshotUsingReloadData(snapshot)
+    }
+    
+    func updateTextPositioning(itemName: ItemName, value: Double) {
+        var current = viewModel.settingsProvider.textPosition
+        switch itemName {
+        case .leftAlignment: current.leftAlignment = value
+        case .cardNumberGroupTopAlignment: current.cardNumberGroupTopAlignment = value
+        case .dateCvvGroupTopAlignment: current.dateCvvGroupTopAlignment = value
+        case .cardHolderNameGroupTopAlignment: current.cardHolderNameGroupTopAlignment = value
+        default: return
+        }
+        viewModel.settingsProvider.updateTextPosition(current)
     }
     
     func updateSettings(itemName: ItemName, text: String) {
         var settings = self.viewModel.settingsProvider.settings
+        if itemName == .theme, let theme = viewModel.themes.first(where: { $0.name == text }) {
+            viewModel.updateTheme(theme)
+            return
+        }
+        if itemName == .language, let lang = viewModel.languages.first(where: { $0.localizedString == text }) {
+            viewModel.updateLanguage(lang)
+            return
+        }
+        
         switch itemName {
         case .cardIdentifierId:
             settings.cardIdentifier.Id = text
@@ -270,17 +315,21 @@ private extension SettingsViewController {
             settings.connection.bankCode = text
         case .pinLength:
             settings.pinType = NIPinFormType.allCases.first { $0.text == text } ?? NIPinFormType.allCases[0]
-        case .language:
-            if let lang = viewModel.languages.first(where: { $0.localizedString == text }) {
-                viewModel.updateLanguage(lang)
-            }
-            return
-        case .theme:
-            if let theme = viewModel.themes.first(where: { $0.name == text }) {
-                viewModel.updateTheme(theme)
-            }
-            return
+        default: break
         }
         viewModel.updateSettings(settings)
     }
 }
+
+fileprivate extension TextPositioning {
+    func value(for itemName: SettingsViewController.ItemName) -> Double {
+        switch itemName {
+        case .leftAlignment: return leftAlignment
+        case .cardNumberGroupTopAlignment: return cardNumberGroupTopAlignment
+        case .dateCvvGroupTopAlignment: return dateCvvGroupTopAlignment
+        case .cardHolderNameGroupTopAlignment: return cardHolderNameGroupTopAlignment
+        default: return 0
+        }
+    }
+}
+

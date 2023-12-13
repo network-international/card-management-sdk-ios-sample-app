@@ -10,6 +10,7 @@
 		BA70A13C2B2034C200A196C9 /* TextFieldContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA70A13B2B2034C100A196C9 /* TextFieldContentConfiguration.swift */; };
 		BA70A1402B20834100A196C9 /* SegmentedContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA70A13F2B20834100A196C9 /* SegmentedContentConfiguration.swift */; };
 		BA70A1422B2088DD00A196C9 /* UIView+pinned.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA70A1412B2088DD00A196C9 /* UIView+pinned.swift */; };
+		BA70A1442B29BBB100A196C9 /* StepperContentConfigaration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA70A1432B29BBB100A196C9 /* StepperContentConfigaration.swift */; };
 		BAA03BFC2B0608D8007C1800 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA03BFB2B0608D8007C1800 /* RootViewController.swift */; };
 		BAA03BFE2B061559007C1800 /* RootViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA03BFD2B061559007C1800 /* RootViewModel.swift */; };
 		BAA03C032B061E65007C1800 /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA03C022B061E65007C1800 /* SettingsModel.swift */; };
@@ -48,6 +49,7 @@
 		BA70A13B2B2034C100A196C9 /* TextFieldContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldContentConfiguration.swift; sourceTree = "<group>"; };
 		BA70A13F2B20834100A196C9 /* SegmentedContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedContentConfiguration.swift; sourceTree = "<group>"; };
 		BA70A1412B2088DD00A196C9 /* UIView+pinned.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+pinned.swift"; sourceTree = "<group>"; };
+		BA70A1432B29BBB100A196C9 /* StepperContentConfigaration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepperContentConfigaration.swift; sourceTree = "<group>"; };
 		BAA03BFB2B0608D8007C1800 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		BAA03BFD2B061559007C1800 /* RootViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewModel.swift; sourceTree = "<group>"; };
 		BAA03C022B061E65007C1800 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 				BAA03C062B06C587007C1800 /* SettingsViewController.swift */,
 				BA70A13B2B2034C100A196C9 /* TextFieldContentConfiguration.swift */,
 				BA70A13F2B20834100A196C9 /* SegmentedContentConfiguration.swift */,
+				BA70A1432B29BBB100A196C9 /* StepperContentConfigaration.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -315,6 +318,7 @@
 				BAA03C0E2B06D253007C1800 /* LogoView.swift in Sources */,
 				BAA03BFE2B061559007C1800 /* RootViewModel.swift in Sources */,
 				F4E7694828EB4CC700CDC7E4 /* AppDelegate.swift in Sources */,
+				BA70A1442B29BBB100A196C9 /* StepperContentConfigaration.swift in Sources */,
 				BA70A1422B2088DD00A196C9 /* UIView+pinned.swift in Sources */,
 				BA70A1402B20834100A196C9 /* SegmentedContentConfiguration.swift in Sources */,
 				BA70A13C2B2034C200A196C9 /* TextFieldContentConfiguration.swift in Sources */,

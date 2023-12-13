@@ -30,7 +30,10 @@ class LogoView: UIView {
         ])
         leadingConstraint = logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor)
         trailingConstraint = logoImageView.trailingAnchor.constraint(equalTo: trailingAnchor)
+        leadingConstraint.priority = .defaultHigh
+        trailingConstraint.priority = .defaultLow
         leadingConstraint.isActive = true
+        trailingConstraint.isActive = true
     }
     
     required init(coder aDecoder: NSCoder) {
@@ -39,8 +42,14 @@ class LogoView: UIView {
     
     func update(with language: NILanguage) {
         logoImageView.image = language.logo
-        leadingConstraint.isActive = language == .english
-        trailingConstraint.isActive = language == .arabic
+        switch language {
+        case .arabic:
+            leadingConstraint.priority = .defaultLow
+            trailingConstraint.priority = .defaultHigh
+        case .english:
+            leadingConstraint.priority = .defaultHigh
+            trailingConstraint.priority = .defaultLow
+        }
     }
 }
 

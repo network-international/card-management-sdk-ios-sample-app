@@ -11,10 +11,7 @@ import NICardManagementSDK
 struct SettingsModel {
     var connection: Connection
     var cardIdentifier: CardIdentifier
-    
     var pinType: NIPinFormType
-    var language: NILanguage
-    var theme: NITheme
 }
 
 extension SettingsModel {
@@ -38,9 +35,7 @@ extension SettingsModel {
         return .init(
             connection: connection,
             cardIdentifier: cardIdentifier,
-            pinType: .initial,
-            language: .initial,
-            theme: .initial
+            pinType: .initial
         )
     }
 }
@@ -64,20 +59,4 @@ extension SettingsModel.CardIdentifier {
 extension NIPinFormType {
     // according to SDK if no pinType provided - use `.dynamic`
     static var initial: Self { .dynamic }
-}
-extension NILanguage {
-    static var initial: Self {
-        guard 
-            let preferred = Locale.preferredLanguages.first,
-            preferred.hasPrefix("ar")
-        else {
-            return .english
-        }
-        return .arabic
-    }
-}
-extension NITheme {
-    static var initial: Self {
-        UIScreen.main.traitCollection.userInterfaceStyle == .light ? .light : .dark
-    }
 }

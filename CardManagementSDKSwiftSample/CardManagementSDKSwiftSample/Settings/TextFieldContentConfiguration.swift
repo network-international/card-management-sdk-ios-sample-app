@@ -44,6 +44,14 @@ class TextFieldContentView: UIView, UIContentView {
         textField.text = configuration.text
         textField.placeholder = configuration.placeholder
         _configuration = configuration
+        guard configuration.pickerSource != nil else {
+            textField.inputView = nil
+            return
+        }
+        let pickerView = UIPickerView()
+        pickerView.delegate = self
+        pickerView.dataSource = self
+        textField.inputView = pickerView
     }
 
     required init(configuration: Configuration) {
@@ -63,15 +71,6 @@ class TextFieldContentView: UIView, UIContentView {
             }
             self?._configuration.textChanged?(textField.text)
         })
-        
-        guard configuration.pickerSource != nil else {
-            textField.inputView = nil
-            return
-        }
-        let pickerView = UIPickerView()
-        pickerView.delegate = self
-        pickerView.dataSource = self
-        textField.inputView = pickerView
     }
 
     @available(*, unavailable)
