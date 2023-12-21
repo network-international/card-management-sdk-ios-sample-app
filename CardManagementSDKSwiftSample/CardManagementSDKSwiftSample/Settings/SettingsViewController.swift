@@ -99,6 +99,7 @@ private extension NIPinFormType {
 // MARK: - DataSource
 fileprivate extension SettingsViewController {
     enum Section: Int, CustomStringConvertible, CaseIterable {
+        case credentials
         case cardIdentifier
         case connection
         case pinType
@@ -108,6 +109,7 @@ fileprivate extension SettingsViewController {
         
         var description: String {
             switch self {
+            case .credentials: return "Client Credentials"
             case .cardIdentifier: return "Card Identifier"
             case .connection: return "Connection settings"
             case .pinType: return "Pin Length"
@@ -136,10 +138,14 @@ fileprivate extension SettingsViewController {
         var text: String
     }
     enum ItemName: String {
+        // credentials
+        case clientId = "Client Id"
+        case clientSecret = "Client secret"
+        case tokenUrl = "Token fetch url"
+        // card info
         case cardIdentifierId = "Card Identifier Id"
         case cardIdentifierType = "Card Identifier Type"
         case rootUrl = "Root URL"
-        case token = "Token"
         case bankCode = "Bank code"
         case pinLength = "PIN length"
         case language = "Language"
@@ -210,6 +216,21 @@ fileprivate extension SettingsViewController {
         snapshot.deleteAllItems()
         snapshot.appendSections(Section.allCases)
         snapshot.appendItems([
+            .header(Section.credentials.description),
+            .row(.init(
+                name: .clientId,
+                text: viewModel.settingsProvider.settings.credentials.clientId
+            )),
+            .row(.init(
+                name: .clientSecret,
+                text: viewModel.settingsProvider.settings.credentials.clientSecret
+            )),
+            .row(.init(
+                name: .tokenUrl,
+                text: viewModel.settingsProvider.settings.credentials.tokenUrl
+            ))
+        ], toSection: .credentials)
+        snapshot.appendItems([
             .header(Section.cardIdentifier.description),
             .row(.init(
                 name: .cardIdentifierId,
@@ -225,10 +246,6 @@ fileprivate extension SettingsViewController {
             .row(.init(
                 name: .rootUrl,
                 text: viewModel.settingsProvider.settings.connection.baseUrl
-            )),
-            .row(.init(
-                name: .token,
-                text: viewModel.settingsProvider.settings.connection.token
             )),
             .row(.init(
                 name: .bankCode,
@@ -303,14 +320,20 @@ fileprivate extension SettingsViewController {
         }
         
         switch itemName {
+            // credentials
+        case .clientId:
+            settings.credentials.clientId = text
+        case .clientSecret:
+            settings.credentials.clientSecret = text
+        case .tokenUrl:
+            settings.credentials.tokenUrl = text
+            
         case .cardIdentifierId:
             settings.cardIdentifier.Id = text
         case .cardIdentifierType:
             settings.cardIdentifier.type = text
         case .rootUrl:
             settings.connection.baseUrl = text
-        case .token:
-            settings.connection.token = text
         case .bankCode:
             settings.connection.bankCode = text
         case .pinLength:
