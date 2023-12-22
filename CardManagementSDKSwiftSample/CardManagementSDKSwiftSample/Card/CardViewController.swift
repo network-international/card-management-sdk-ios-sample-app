@@ -17,6 +17,8 @@ class CardViewController: UIViewController {
     private let pinViewHolder = UIView()
     private let cardViewHolder = UIView()
     
+    private var sdk: NICardManagementAPI
+    
     private lazy var cardViewCallback: (NISuccessResponse?, NIErrorResponse?, @escaping () -> Void) -> Void = { [weak self] successResponse, errorResponse, callback  in
         print("Success Response \(successResponse?.message ?? "-"); \nError code: \(errorResponse?.errorCode ?? "-"), Error message: \(errorResponse?.errorMessage ?? "-")")
         self?.presentedViewController?.dismiss(animated: true)
@@ -35,6 +37,7 @@ class CardViewController: UIViewController {
     init(viewModel: CardViewModel) {
         self.viewModel = viewModel
         logo = LogoView(currentLanguage: viewModel.settingsProvider.currentLanguage)
+        sdk = viewModel.settingsProvider.settings.buildSdk()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -48,6 +51,7 @@ class CardViewController: UIViewController {
         viewModel.settingsProvider.$settings
             .receive(on: RunLoop.main)
             .sink { [weak self] settings in
+                self?.sdk = settings.buildSdk()
                 // refresh UI
                 self?.fillContent()
             }
@@ -60,35 +64,6 @@ class CardViewController: UIViewController {
 }
 
 private extension CardViewController {
-    
-    var cardViewInput: NIInput {
-
-        
-        return NIInput(
-            bankCode: viewModel.settingsProvider.settings.connection.bankCode,
-            cardIdentifierId: viewModel.settingsProvider.settings.cardIdentifier.Id,
-            cardIdentifierType: viewModel.settingsProvider.settings.cardIdentifier.type,
-            connectionProperties: NIConnectionProperties(
-                rootUrl: viewModel.settingsProvider.settings.connection.baseUrl,
-                token: viewModel.settingsProvider.settings.connection.token
-            ),
-            displayAttributes: NIDisplayAttributes(
-                theme: viewModel.settingsProvider.theme,
-                language: viewModel.settingsProvider.currentLanguage, // can be nil
-                fonts: viewModel.settingsProvider.fonts, // can be omitted
-                cardAttributes: cardAttributes // can be nil
-            )
-        )
-    }
-    
-    var cardAttributes: NICardAttributes {
-        NICardAttributes(
-            shouldHide: true,
-            backgroundImage: viewModel.settingsProvider.cardBackgroundImage,
-            textPositioning: viewModel.settingsProvider.textPosition.sdkValue
-        )
-    }
-    
     func setupView() {
         view.addSubview(logo)
         NSLayoutConstraint.activate([
@@ -164,19 +139,19 @@ private extension CardViewController {
             action: UIAction { [weak self] _ in
                 guard let self = self else { return }
                 // for presenting new CardViewController
-                // NICardManagementAPI.displayCardDetailsForm(input: self.cardViewInput, viewController: self, completion: cardViewCallback)
+                // sdk.displayCardDetailsForm(viewController: self, completion: cardViewCallback)
                 
                 // for retrieving info only
-                // NICardManagementAPI.getCardDetails(input: self.cardViewInput, completion: cardViewCallback)
+                // sdk.getCardDetails(completion: cardViewCallback)
                 
                 // show in-place
                 if let cardView = self.cardViewHolder.subviews.last as? NICardView {
-                    cardView.setInput(input: self.cardViewInput, completion: self.cardViewCallback)
+                    cardView.configure(displayAttributes: self.viewModel.displayAttributes, service: sdk, completion: self.cardViewCallback)
                     // this can be done with `cardAttributes`
                     // cardView.setBackgroundImage(image: viewModel.settingsProvider.cardBackgroundImage)
                 } else {
                     // card
-                    let cardView = NICardView(input: self.cardViewInput, completion: self.cardViewCallback)
+                    let cardView = NICardView(displayAttributes: self.viewModel.displayAttributes, service: sdk, completion: self.cardViewCallback)
                     self.cardViewHolder.addSubview(cardView)
                     cardView.translatesAutoresizingMaskIntoConstraints = false
                     NSLayoutConstraint.activate([
@@ -206,7 +181,7 @@ private extension CardViewController {
                 let dummyVC = UIViewController()
                 let navVC = UINavigationController(rootViewController: dummyVC)
                 navVC.isNavigationBarHidden = true
-                NICardManagementAPI.setPinForm(input: self.cardViewInput, type: pinType, viewController: dummyVC, completion: cardViewCallback)
+                self.sdk.setPinForm(type: pinType, viewController: dummyVC, displayAttributes: self.viewModel.displayAttributes, completion: cardViewCallback)
                 self.present(navVC, animated: true)
             }
         ))
@@ -225,7 +200,7 @@ private extension CardViewController {
                 let dummyVC = UIViewController()
                 let navVC = UINavigationController(rootViewController: dummyVC)
                 navVC.isNavigationBarHidden = true
-                NICardManagementAPI.changePinForm(input: self.cardViewInput, type: pinType, viewController: dummyVC, completion: cardViewCallback)
+                self.sdk.changePinForm(type: pinType, viewController: dummyVC, displayAttributes: self.viewModel.displayAttributes, completion: cardViewCallback)
                 self.present(navVC, animated: true)
             }
         ))
@@ -245,7 +220,7 @@ private extension CardViewController {
                 let navVC = UINavigationController(rootViewController: dummyVC)
                 navVC.isNavigationBarHidden = true
 
-                NICardManagementAPI.verifyPinForm(input: self.cardViewInput, type: pinType, viewController: dummyVC, completion: cardViewCallback)
+                self.sdk.verifyPinForm(type: pinType, viewController: dummyVC, displayAttributes: self.viewModel.displayAttributes, completion: cardViewCallback)
                 self.present(navVC, animated: true)
             }
         ))
@@ -261,9 +236,9 @@ private extension CardViewController {
                 let color: UIColor = .gray
                 // show in-place
                 if let pinView = self.pinViewHolder.subviews.last as? NIViewPinView {
-                    pinView.setInput(input: self.cardViewInput, timer: timer, color: color, completion: cardViewCallback)
+                    pinView.configure(displayAttributes: self.viewModel.displayAttributes, service: self.sdk, timer: timer, color: color, completion: cardViewCallback)
                 } else {
-                    let pinView = NIViewPinView(input: self.cardViewInput, timer: timer, color: color, completion: cardViewCallback)
+                    let pinView = NIViewPinView(displayAttributes: self.viewModel.displayAttributes, service: self.sdk, timer: timer, color: color, completion: cardViewCallback)
                     self.pinViewHolder.addSubview(pinView)
                     pinView.translatesAutoresizingMaskIntoConstraints = false
                     NSLayoutConstraint.activate([
@@ -306,5 +281,43 @@ private extension CardViewController {
         ])
         label.text = text
         return view
+    }
+}
+
+private extension CardViewModel {
+    var displayAttributes: NIDisplayAttributes {
+        NIDisplayAttributes(
+            theme: settingsProvider.theme,
+            language: settingsProvider.currentLanguage, // can be nil
+            fonts: settingsProvider.fonts, // can be omitted
+            cardAttributes: cardAttributes // can be nil
+        )
+    }
+    
+    var cardAttributes: NICardAttributes {
+        NICardAttributes(
+            shouldHide: true,
+            backgroundImage: settingsProvider.cardBackgroundImage,
+            textPositioning: settingsProvider.textPosition.sdkValue
+        )
+    }
+}
+
+private extension SettingsModel {
+    func buildSdk() -> NICardManagementAPI {
+        NICardManagementAPI(
+            rootUrl: connection.baseUrl,
+            cardIdentifierId: cardIdentifier.Id,
+            cardIdentifierType: cardIdentifier.type,
+            bankCode: connection.bankCode,
+            // use TokenFetcherFactory.makeSimpleWrapper(tokenValue: "token") if you have permanent token
+            tokenFetchable: TokenFetcherFactory.makeNetworkWithCache(
+                urlString: credentials.tokenUrl,
+                credentials: .init(
+                    clientId: credentials.clientId,
+                    clientSecret: credentials.clientSecret
+                )
+            )
+        )
     }
 }

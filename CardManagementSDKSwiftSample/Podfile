@@ -4,6 +4,13 @@ target 'CardManagementSDKSwiftSample' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  pod 'NICardManagementSDK', '~> 1.0'
+  #old API
+  #pod 'NICardManagementSDK', '~> 1.0'
+  
+  #new API
+  pod 'NICardManagementSDK', '~> 1.1.0'
+  
+  #dev mode
+  #pod 'NICardManagementSDK', :path => '~/Documents/projects/card-management-sdk-ios'
 
 end

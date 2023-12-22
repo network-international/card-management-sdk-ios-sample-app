@@ -96,9 +96,10 @@ private extension SettingsProvider {
 fileprivate extension SettingsModel {
     static var zero: SettingsModel {
         .init(
-            connection: .init(baseUrl: "", token: "", bankCode: ""),
+            connection: .init(baseUrl: "", bankCode: ""),
             cardIdentifier: .init(Id: "", type: ""),
-            pinType: .initial
+            pinType: .initial, 
+            credentials: .init(tokenUrl: "", clientId: "", clientSecret: "")
         )
     }
 }
