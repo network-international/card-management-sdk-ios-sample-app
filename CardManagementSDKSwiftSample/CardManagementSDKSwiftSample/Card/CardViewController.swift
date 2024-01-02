@@ -304,20 +304,28 @@ private extension CardViewModel {
 }
 
 private extension SettingsModel {
+    var tokenFetchableSimple: NICardManagementTokenFetchable {
+        TokenFetcherFactory.makeSimpleWrapper(tokenValue:"put your permanent token here")
+    }
+    
+    var tokenFetchableRepository: NICardManagementTokenFetchable {
+        TokenFetcherFactory.makeNetworkWithCache(
+            urlString: credentials.tokenUrl,
+            credentials: .init(
+                clientId: credentials.clientId,
+                clientSecret: credentials.clientSecret
+            )
+        )
+    }
+    
+    
     func buildSdk() -> NICardManagementAPI {
         NICardManagementAPI(
             rootUrl: connection.baseUrl,
             cardIdentifierId: cardIdentifier.Id,
             cardIdentifierType: cardIdentifier.type,
             bankCode: connection.bankCode,
-            // use TokenFetcherFactory.makeSimpleWrapper(tokenValue: "token") if you have permanent token
-            tokenFetchable: TokenFetcherFactory.makeNetworkWithCache(
-                urlString: credentials.tokenUrl,
-                credentials: .init(
-                    clientId: credentials.clientId,
-                    clientSecret: credentials.clientSecret
-                )
-            )
+            tokenFetchable: tokenFetchableRepository
         )
     }
 }

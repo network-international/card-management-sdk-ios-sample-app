@@ -2,7 +2,7 @@ PODS:
   - NICardManagementSDK (1.1.0)
 
 DEPENDENCIES:
-  - NICardManagementSDK (~> 1.1.0)
+  - NICardManagementSDK (~> 1.1)
 
 SPEC REPOS:
   trunk:
@@ -11,6 +11,6 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   NICardManagementSDK: 328d3d16d4ae82c8b62463df6ad8fe427ebbd6fe
 
-PODFILE CHECKSUM: 7e13dda1a063f8535fe5603c261e1aded880629f
+PODFILE CHECKSUM: 676a5c0f16433a8e65c28471844acfe641bb467c
 
 COCOAPODS: 1.14.3
