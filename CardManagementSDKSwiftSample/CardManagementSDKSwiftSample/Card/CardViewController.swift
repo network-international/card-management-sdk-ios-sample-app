@@ -172,8 +172,8 @@ private extension CardViewController {
             action: UIAction { [weak self] _ in
                 guard let self = self else { return }
                 /// Uncomment below section for programatic flow
-                // NICardManagementAPI.setPin(pin: "1234", input: self.cardViewInput, completion: cardViewCallback)
-                // return
+//                self.sdk.setPin(pin: "1111", completion: self.cardViewCallback)
+//                return
                 
                 let pinType = self.viewModel.settingsProvider.settings.pinType
                 // current implementation expecting UINavigationController
@@ -181,7 +181,7 @@ private extension CardViewController {
                 let dummyVC = UIViewController()
                 let navVC = UINavigationController(rootViewController: dummyVC)
                 navVC.isNavigationBarHidden = true
-                self.sdk.setPinForm(type: pinType, viewController: dummyVC, displayAttributes: self.viewModel.displayAttributes, completion: cardViewCallback)
+                self.sdk.setPinForm(type: pinType, viewController: dummyVC, displayAttributes: self.viewModel.displayAttributes, completion: self.cardViewCallback)
                 self.present(navVC, animated: true)
             }
         ))
@@ -191,8 +191,8 @@ private extension CardViewController {
             action: UIAction { [weak self] _ in
                 guard let self = self else { return }
                 // Uncomment below section for programatic flow
-                // NICardManagementAPI.changePin(oldPin: "1234", newPin: "4321", input: self.cardViewInput, completion: cardViewCallback)
-                // return
+//                self.sdk.changePin(oldPin: "1111", newPin: "5555", completion: self.cardViewCallback)
+//                return
                 
                 let pinType = self.viewModel.settingsProvider.settings.pinType
                 // current implementation expecting UINavigationController
