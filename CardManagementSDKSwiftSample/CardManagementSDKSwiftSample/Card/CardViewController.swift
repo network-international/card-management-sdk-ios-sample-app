@@ -325,7 +325,16 @@ private extension SettingsModel {
             cardIdentifierId: cardIdentifier.Id,
             cardIdentifierType: cardIdentifier.type,
             bankCode: connection.bankCode,
-            tokenFetchable: tokenFetchableRepository
+            tokenFetchable: tokenFetchableRepository,
+            // add logger for debugging, like NICardManagementLogging()
+            logger: nil
         )
     }
 }
+/* Logger example
+struct NICardManagementLogging: NICardManagementLogger {
+    func logNICardManagementMessage(_ message: String) {
+        print(message)
+    }
+}
+*/
