@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BA391B442B91CFD9009BB698 /* ExperimentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA391B432B91CFD9009BB698 /* ExperimentsViewController.swift */; };
+		BA391B462B91D0F9009BB698 /* ExperimentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA391B452B91D0F9009BB698 /* ExperimentsViewModel.swift */; };
 		BA70A13C2B2034C200A196C9 /* TextFieldContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA70A13B2B2034C100A196C9 /* TextFieldContentConfiguration.swift */; };
 		BA70A1402B20834100A196C9 /* SegmentedContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA70A13F2B20834100A196C9 /* SegmentedContentConfiguration.swift */; };
 		BA70A1422B2088DD00A196C9 /* UIView+pinned.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA70A1412B2088DD00A196C9 /* UIView+pinned.swift */; };
@@ -46,6 +48,8 @@
 /* Begin PBXFileReference section */
 		3334CC02BE3973F1009C6EEC /* Pods-CardManagementSDKSwiftSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CardManagementSDKSwiftSample.debug.xcconfig"; path = "Target Support Files/Pods-CardManagementSDKSwiftSample/Pods-CardManagementSDKSwiftSample.debug.xcconfig"; sourceTree = "<group>"; };
 		6D64CF51C4EAEE02516B3188 /* Pods_CardManagementSDKSwiftSample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CardManagementSDKSwiftSample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA391B432B91CFD9009BB698 /* ExperimentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentsViewController.swift; sourceTree = "<group>"; };
+		BA391B452B91D0F9009BB698 /* ExperimentsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentsViewModel.swift; sourceTree = "<group>"; };
 		BA70A13B2B2034C100A196C9 /* TextFieldContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldContentConfiguration.swift; sourceTree = "<group>"; };
 		BA70A13F2B20834100A196C9 /* SegmentedContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedContentConfiguration.swift; sourceTree = "<group>"; };
 		BA70A1412B2088DD00A196C9 /* UIView+pinned.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+pinned.swift"; sourceTree = "<group>"; };
@@ -91,6 +95,15 @@
 				EB9D200BDE4CD0A12A579B52 /* Pods-CardManagementSDKSwiftSample.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		BA391B422B91CF9A009BB698 /* Experiments */ = {
+			isa = PBXGroup;
+			children = (
+				BA391B432B91CFD9009BB698 /* ExperimentsViewController.swift */,
+				BA391B452B91D0F9009BB698 /* ExperimentsViewModel.swift */,
+			);
+			path = Experiments;
 			sourceTree = "<group>";
 		};
 		BAA03BFF2B061D9F007C1800 /* Settings */ = {
@@ -184,6 +197,7 @@
 				BAA03C0C2B06D236007C1800 /* Shared */,
 				BAA03BFF2B061D9F007C1800 /* Settings */,
 				BAA03BFB2B0608D8007C1800 /* RootViewController.swift */,
+				BA391B422B91CF9A009BB698 /* Experiments */,
 				BAA03BFD2B061559007C1800 /* RootViewModel.swift */,
 				BAA03C112B0767B8007C1800 /* Service */,
 				BAA03C0F2B06E4DE007C1800 /* Card */,
@@ -320,6 +334,7 @@
 				F4E7694828EB4CC700CDC7E4 /* AppDelegate.swift in Sources */,
 				BA70A1442B29BBB100A196C9 /* StepperContentConfigaration.swift in Sources */,
 				BA70A1422B2088DD00A196C9 /* UIView+pinned.swift in Sources */,
+				BA391B462B91D0F9009BB698 /* ExperimentsViewModel.swift in Sources */,
 				BA70A1402B20834100A196C9 /* SegmentedContentConfiguration.swift in Sources */,
 				BA70A13C2B2034C200A196C9 /* TextFieldContentConfiguration.swift in Sources */,
 				BAA03BFC2B0608D8007C1800 /* RootViewController.swift in Sources */,
@@ -327,6 +342,7 @@
 				BAA03C092B06C862007C1800 /* SettingsViewModel.swift in Sources */,
 				BAA03C152B076968007C1800 /* CardViewModel.swift in Sources */,
 				F4E7694A28EB4CC700CDC7E4 /* SceneDelegate.swift in Sources */,
+				BA391B442B91CFD9009BB698 /* ExperimentsViewController.swift in Sources */,
 				BAA03C032B061E65007C1800 /* SettingsModel.swift in Sources */,
 				BAA03C072B06C587007C1800 /* SettingsViewController.swift in Sources */,
 			);

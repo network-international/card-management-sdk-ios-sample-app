@@ -133,6 +133,12 @@ private extension CardViewController {
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         stackView.addArrangedSubview(cardViewHolder)
         
+        let cardViewCompletion: (NIErrorResponse?) -> Void = { [weak self] errorResp in
+            self?.cardViewCallback(
+                errorResp == nil ? NISuccessResponse(message: "Card details retrieved with success!") : nil,
+                errorResp
+            ){}
+        }
         // show card
         stackView.addArrangedSubview(makeButton(
             title: "Show card details",
@@ -146,12 +152,12 @@ private extension CardViewController {
                 
                 // show in-place
                 if let cardView = self.cardViewHolder.subviews.last as? NICardView {
-                    cardView.configure(displayAttributes: self.viewModel.displayAttributes, service: sdk, completion: self.cardViewCallback)
+                    cardView.configure(displayAttributes: self.viewModel.displayAttributes, service: sdk, completion: cardViewCompletion)
                     // this can be done with `cardAttributes`
                     // cardView.setBackgroundImage(image: viewModel.settingsProvider.cardBackgroundImage)
                 } else {
                     // card
-                    let cardView = NICardView(displayAttributes: self.viewModel.displayAttributes, service: sdk, completion: self.cardViewCallback)
+                    let cardView = NICardView()
                     self.cardViewHolder.addSubview(cardView)
                     cardView.translatesAutoresizingMaskIntoConstraints = false
                     NSLayoutConstraint.activate([
@@ -160,7 +166,7 @@ private extension CardViewController {
                         cardView.leadingAnchor.constraint(equalTo: self.cardViewHolder.leadingAnchor),
                         cardView.trailingAnchor.constraint(equalTo: self.cardViewHolder.trailingAnchor)
                     ])
-                    
+                    cardView.configure(displayAttributes: self.viewModel.displayAttributes, service: sdk, completion: cardViewCompletion)
                 }
             }
         ))
@@ -298,43 +304,8 @@ private extension CardViewModel {
         NICardAttributes(
             shouldHide: true,
             backgroundImage: settingsProvider.cardBackgroundImage,
-            textPositioning: settingsProvider.textPosition.sdkValue
+            textPositioning: settingsProvider.textPosition.sdkValue,
+            elementsColor: .niAlwaysWhite
         )
     }
 }
-
-private extension SettingsModel {
-    var tokenFetchableSimple: NICardManagementTokenFetchable {
-        TokenFetcherFactory.makeSimpleWrapper(tokenValue:"put your permanent token here")
-    }
-    
-    var tokenFetchableRepository: NICardManagementTokenFetchable {
-        TokenFetcherFactory.makeNetworkWithCache(
-            urlString: credentials.tokenUrl,
-            credentials: .init(
-                clientId: credentials.clientId,
-                clientSecret: credentials.clientSecret
-            )
-        )
-    }
-    
-    
-    func buildSdk() -> NICardManagementAPI {
-        NICardManagementAPI(
-            rootUrl: connection.baseUrl,
-            cardIdentifierId: cardIdentifier.Id,
-            cardIdentifierType: cardIdentifier.type,
-            bankCode: connection.bankCode,
-            tokenFetchable: tokenFetchableRepository,
-            // add logger for debugging, like NICardManagementLogging()
-            logger: nil
-        )
-    }
-}
-/* Logger example
-struct NICardManagementLogging: NICardManagementLogger {
-    func logNICardManagementMessage(_ message: String) {
-        print(message)
-    }
-}
-*/

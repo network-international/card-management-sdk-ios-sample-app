@@ -29,10 +29,13 @@ class RootViewController: UITabBarController {
         let cardVc = CardViewController(viewModel: CardViewModel(settingsProvider: viewModel.settingsProvider))
         cardVc.tabBarItem = UITabBarItem(title: "Card", image: UIImage(systemName: "creditcard.and.123"), tag: 0)
         
-        let settingsVc = SettingsViewController(viewModel: SettingsViewModel(settingsProvider: viewModel.settingsProvider))
-        settingsVc.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gearshape"), tag: 1)
+        let experimentsVc = ExperimentsViewController(viewModel: ExperimentsViewModel(settingsProvider: viewModel.settingsProvider))
+        experimentsVc.tabBarItem = UITabBarItem(title: "Experiments", image: UIImage(systemName: "pencil.slash"), tag: 1)
         
-        viewControllers = [cardVc, settingsVc]
+        let settingsVc = SettingsViewController(viewModel: SettingsViewModel(settingsProvider: viewModel.settingsProvider))
+        settingsVc.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gearshape"), tag: 2)
+        
+        viewControllers = [cardVc, experimentsVc, settingsVc]
         
         viewModel.settingsProvider.$theme
             .receive(on: RunLoop.main)

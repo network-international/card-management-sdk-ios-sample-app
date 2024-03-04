@@ -65,3 +65,37 @@ extension NITheme {
         }
     }
 }
+
+extension SettingsModel {
+    var tokenFetchableSimple: NICardManagementTokenFetchable {
+        TokenFetcherFactory.makeSimpleWrapper(tokenValue:"put your token here")
+    }
+    
+    var tokenFetchableRepository: NICardManagementTokenFetchable {
+        TokenFetcherFactory.makeNetworkWithCache(
+            urlString: credentials.tokenUrl,
+            credentials: .init(
+                clientId: credentials.clientId,
+                clientSecret: credentials.clientSecret
+            )
+        )
+    }
+    
+    func buildSdk() -> NICardManagementAPI {
+        NICardManagementAPI(
+            rootUrl: connection.baseUrl,
+            cardIdentifierId: cardIdentifier.Id,
+            cardIdentifierType: cardIdentifier.type,
+            bankCode: connection.bankCode,
+            tokenFetchable: tokenFetchableRepository,
+            // add logger for debugging, like NICardManagementLogging()
+            logger: NICardManagementLogging()
+        )
+    }
+}
+/* Logger example */
+struct NICardManagementLogging: NICardManagementLogger {
+    func logNICardManagementMessage(_ message: String) {
+        print(message)
+    }
+}
