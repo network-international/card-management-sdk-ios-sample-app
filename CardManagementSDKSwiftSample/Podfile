@@ -8,7 +8,7 @@ target 'CardManagementSDKSwiftSample' do
   #pod 'NICardManagementSDK', '~> 1.0'
   
   #new API
-  pod 'NICardManagementSDK'#, '1.2.1'
+  pod 'NICardManagementSDK'#, '1.2.2'
   
   #dev mode
   #pod 'NICardManagementSDK', :path => '~/Documents/projects/card-management-sdk-ios'
