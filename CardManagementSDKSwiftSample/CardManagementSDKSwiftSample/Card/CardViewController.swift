@@ -152,7 +152,7 @@ private extension CardViewController {
                 
                 // show in-place
                 if let cardView = self.cardViewHolder.subviews.last as? NICardView {
-                    cardView.configure(displayAttributes: self.viewModel.displayAttributes, service: sdk, completion: cardViewCompletion)
+                    cardView.configure(displayAttributes: self.viewModel.displayAttributes, maskableValues: Set(UIElement.CardDetails.Value.allCases), service: sdk, completion: cardViewCompletion)
                     // this can be done with `cardAttributes`
                     // cardView.setBackgroundImage(image: viewModel.settingsProvider.cardBackgroundImage)
                 } else {
@@ -166,7 +166,7 @@ private extension CardViewController {
                         cardView.leadingAnchor.constraint(equalTo: self.cardViewHolder.leadingAnchor),
                         cardView.trailingAnchor.constraint(equalTo: self.cardViewHolder.trailingAnchor)
                     ])
-                    cardView.configure(displayAttributes: self.viewModel.displayAttributes, service: sdk, completion: cardViewCompletion)
+                    cardView.configure(displayAttributes: self.viewModel.displayAttributes, maskableValues: Set(UIElement.CardDetails.Value.allCases), service: sdk, completion: cardViewCompletion)
                 }
             }
         ))
@@ -302,10 +302,9 @@ private extension CardViewModel {
     
     var cardAttributes: NICardAttributes {
         NICardAttributes(
-            shouldHide: true,
+            shouldBeMaskedDefault: Set(UIElement.CardDetails.Value.allCases),
             backgroundImage: settingsProvider.cardBackgroundImage,
-            textPositioning: settingsProvider.textPosition.sdkValue,
-            elementsColor: .niAlwaysWhite
+            textPositioning: settingsProvider.textPosition.sdkValue
         )
     }
 }
