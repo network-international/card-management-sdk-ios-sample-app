@@ -153,14 +153,82 @@ private extension ExperimentsViewController {
         customView.translatesAutoresizingMaskIntoConstraints = false
         customView.axis = .vertical
         customView.spacing = 10
-        customView.addArrangedSubview(cardPresenter.cardNumber.title)
-        customView.addArrangedSubview(cardPresenter.cardNumber.value)
-        customView.addArrangedSubview(cardPresenter.cardCvv.title)
-        customView.addArrangedSubview(cardPresenter.cardCvv.value)
+        // card number line
+        let copyCardNumberBtn = UIButton(primaryAction: UIAction(
+            image: UIImage(systemName: "square.and.arrow.up.circle"),
+            handler: { [cardPresenter] _ in
+                cardPresenter.cardNumber.copyToClipboard()
+            }
+        ))
+        let maskCardNumberBtn = UIButton(primaryAction: UIAction(
+            image: UIImage(systemName: "eye.slash"),
+            handler: { [cardPresenter] _ in
+                let isMasked = cardPresenter.isMasked(.cardNumber)
+                var maskedElements = cardPresenter.maskedElements
+                if cardPresenter.isMasked(.cardNumber) {
+                    maskedElements.remove(.cardNumber)
+                } else {
+                    maskedElements.insert(.cardNumber)
+                }
+                cardPresenter.toggle(isMasked: maskedElements)
+            }
+        ))
+        let cardNumberLine = UIStackView(arrangedSubviews: [
+            cardPresenter.cardNumber.title,
+            UIView(),
+            cardPresenter.cardNumber.value,
+            copyCardNumberBtn,
+            maskCardNumberBtn
+        ])
+        cardNumberLine.axis = .horizontal
+        cardNumberLine.spacing = 10
+        cardNumberLine.distribution = .fill
+        customView.addArrangedSubview(cardNumberLine)
+        
+        // cvv line
+        let copyCvvBtn = UIButton(primaryAction: UIAction(
+            image: UIImage(systemName: "square.and.arrow.up.circle"),
+            handler: { [cardPresenter] _ in
+                cardPresenter.cardCvv.copyToClipboard()
+            }
+        ))
+        let maskCvvBtn = UIButton(primaryAction: UIAction(
+            image: UIImage(systemName: "eye.slash"),
+            handler: { [cardPresenter] _ in
+                let isMasked = cardPresenter.isMasked(.cvv)
+                var maskedElements = cardPresenter.maskedElements
+                if cardPresenter.isMasked(.cvv) {
+                    maskedElements.remove(.cvv)
+                } else {
+                    maskedElements.insert(.cvv)
+                }
+                cardPresenter.toggle(isMasked: maskedElements)
+            }
+        ))
+        let cvvLine = UIStackView(arrangedSubviews: [
+            cardPresenter.cardCvv.title,
+            UIView(),
+            cardPresenter.cardCvv.value,
+            copyCvvBtn,
+            maskCvvBtn
+        ])
+        cvvLine.axis = .horizontal
+        cvvLine.spacing = 10
+        customView.addArrangedSubview(cvvLine)
+        
         customView.addArrangedSubview(cardPresenter.cardExpiry.title)
         customView.addArrangedSubview(cardPresenter.cardExpiry.value)
         customView.addArrangedSubview(cardPresenter.cardHolder.title)
         customView.addArrangedSubview(cardPresenter.cardHolder.value)
+        let maskAllBtn = UIButton(primaryAction: UIAction(
+            title: "Toggle Masking All",
+            image: UIImage(systemName: "eye.slash"),
+            handler: { [cardPresenter] _ in
+                cardPresenter.toggle(isMasked: cardPresenter.maskedElements.isEmpty ? Set(UIElement.CardDetails.Value.allCases) : Set())
+            }
+        ))
+        customView.addArrangedSubview(maskAllBtn)
+        
         let activity = UIActivityIndicatorView(style: .large)
         activity.startAnimating()
         activity.hidesWhenStopped = true
@@ -204,10 +272,19 @@ private extension ExperimentsViewModel {
     
     var cardAttributes: NICardAttributes {
         NICardAttributes(
-            shouldHide: false,
+            shouldBeMaskedDefault: Set([.cvv]), // initially only cvv will be masked
             backgroundImage: settingsProvider.cardBackgroundImage,
             textPositioning: settingsProvider.textPosition.sdkValue,
-            elementsColor: .label // this color supports theme switching
+            colors: [
+                UIElementColor(element: UIElement.CardDetails.Label.cardNumber, color: .red),
+                UIElementColor(element: UIElement.CardDetails.Value.cardNumber, color: .purple),
+                UIElementColor(element: UIElement.CardDetails.Label.cvv, color: .blue),
+                UIElementColor(element: UIElement.CardDetails.Value.cvv, color: .green),
+            ],
+            labels: [
+                .cardNumber: "My card >>", // use localised strings here
+                .cvv: "My CVV >>"
+            ]
         )
     }
 }

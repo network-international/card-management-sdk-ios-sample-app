@@ -17,7 +17,7 @@ class SettingsProvider {
     @Published private(set) var textPosition: TextPositioning
 
     @Published private(set) var cardBackgroundImage = UIImage(resource: .background)
-    @Published private(set) var fonts: [NIFontLabelPair]
+    @Published private(set) var fonts: [UIElementFont]
     
     init() {
         settings = Self.readSettings()
@@ -67,29 +67,12 @@ private extension SettingsProvider {
         return settings
     }
     
-    static var initialFonts: [NIFontLabelPair] {
+    static var initialFonts: [UIElementFont] {
         // Example of setting of a specific fonts (this is optional)
-        let fonts = [
-            NIFontLabelPair(
-                font: UIFont(name: "Helvetica", size: 18)!, // System font
-                label: .setPinDescriptionLabel
-            ),
-            NIFontLabelPair(
-                font: UIFont(name: "Helvetica", size: 18)!, // System font
-                label: .verifyPinDescriptionLabel
-            )
+        [
+            UIElementFont(element: UIElement.PinFormLabel.setPinDescription, font: UIFont(name: "Helvetica", size: 18) ?? UIFont.systemFont(ofSize: 18)),
+            UIElementFont(element: UIElement.PinFormLabel.verifyPinDescription, font: UIFont(name: "Helvetica", size: 18) ?? UIFont.systemFont(ofSize: 18))
         ]
-//        fonts = [
-//             (font: UIFont(name: "Arial", size: 14.0)!, label: .cardNumberLabel),
-//            NIFontLabelPair(font: valueFont, label: .cardNumberValueLabel),
-//            NIFontLabelPair(font: labelFont, label: .expiryDateLabel),
-//            NIFontLabelPair(font: valueFont, label: .expiryDateValueLabel),
-//            NIFontLabelPair(font: labelFont, label: .cvvLabel),
-//            NIFontLabelPair(font: valueFont, label: .cvvValueLabel),
-//            NIFontLabelPair(font: labelFont, label: .cardholderNameLabel),
-//            NIFontLabelPair(font: labelFont, label: .cardholderNameTagLabel)
-//        ]
-        return fonts
     }
 }
 
