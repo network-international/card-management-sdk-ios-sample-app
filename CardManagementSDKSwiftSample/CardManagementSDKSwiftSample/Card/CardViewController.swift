@@ -168,15 +168,16 @@ private extension CardViewController {
                 
                 // for retrieving info only
                 // NICardManagementAPI.getCardDetails(input: self.cardViewInput, completion: cardViewCallback)
-                
+                var cardViewInput = self.cardViewInput
+                cardViewInput.displayAttributes?.cardAttributes?.elementsColor = .blue
                 // show in-place
                 if let cardView = self.cardViewHolder.subviews.last as? NICardView {
-                    cardView.setInput(input: self.cardViewInput, completion: self.cardViewCallback)
+                    cardView.setInput(input: cardViewInput, completion: self.cardViewCallback)
                     // this can be done with `cardAttributes`
                     // cardView.setBackgroundImage(image: viewModel.settingsProvider.cardBackgroundImage)
                 } else {
                     // card
-                    let cardView = NICardView(input: self.cardViewInput, completion: self.cardViewCallback)
+                    let cardView = NICardView(input: cardViewInput, completion: self.cardViewCallback)
                     self.cardViewHolder.addSubview(cardView)
                     cardView.translatesAutoresizingMaskIntoConstraints = false
                     NSLayoutConstraint.activate([
@@ -260,20 +261,20 @@ private extension CardViewController {
                 let timer: Double = 5
                 let color: UIColor = .gray
                 // show in-place
-                if let pinView = self.pinViewHolder.subviews.last as? NIViewPinView {
-                    pinView.setInput(input: self.cardViewInput, timer: timer, color: color, completion: cardViewCallback)
-                } else {
-                    let pinView = NIViewPinView(input: self.cardViewInput, timer: timer, color: color, completion: cardViewCallback)
-                    self.pinViewHolder.addSubview(pinView)
-                    pinView.translatesAutoresizingMaskIntoConstraints = false
-                    NSLayoutConstraint.activate([
-                        pinView.topAnchor.constraint(equalTo: self.pinViewHolder.topAnchor),
-                        pinView.bottomAnchor.constraint(equalTo: self.pinViewHolder.bottomAnchor),
-                        pinView.leadingAnchor.constraint(equalTo: self.pinViewHolder.leadingAnchor),
-                        pinView.trailingAnchor.constraint(equalTo: self.pinViewHolder.trailingAnchor)
-                    ])
-                    
-                }
+//                if let pinView = self.pinViewHolder.subviews.last as? NIViewPinView {
+//                    pinView.setInput(input: self.cardViewInput, timer: timer, color: color, completion: cardViewCallback)
+//                } else {
+//                    let pinView = NIViewPinView(input: self.cardViewInput, timer: timer, color: color, completion: cardViewCallback)
+//                    self.pinViewHolder.addSubview(pinView)
+//                    pinView.translatesAutoresizingMaskIntoConstraints = false
+//                    NSLayoutConstraint.activate([
+//                        pinView.topAnchor.constraint(equalTo: self.pinViewHolder.topAnchor),
+//                        pinView.bottomAnchor.constraint(equalTo: self.pinViewHolder.bottomAnchor),
+//                        pinView.leadingAnchor.constraint(equalTo: self.pinViewHolder.leadingAnchor),
+//                        pinView.trailingAnchor.constraint(equalTo: self.pinViewHolder.trailingAnchor)
+//                    ])
+//                    
+//                }
             }
         ))
         
